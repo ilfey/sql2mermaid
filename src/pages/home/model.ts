@@ -1,4 +1,4 @@
-import {atom} from "shared/factory";
+import {atom} from "shared/lib/factory";
 import {createGate} from "effector-react";
 import {createEvent, createStore} from "effector";
 
