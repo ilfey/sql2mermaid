@@ -1,23 +1,42 @@
 import {atom} from "shared/lib/factory";
 import {createGate} from "effector-react";
-import {createEvent, createStore} from "effector";
+import {createEvent, createStore, sample} from "effector";
+import {convertQuery} from "pages/home/api";
 
 export const homeModel = atom(() => {
   const HomeGate = createGate()
 
-  const increment = createEvent()
-  const decrement = createEvent()
+  const onConvert = createEvent()
+  const onSourceChange = createEvent<string>()
 
-  const $count = createStore(0)
+  const $pending = convertQuery.$pending
+  const $source = createStore('')
+  const $mermaid = createStore('')
 
-  $count
-    .on(increment, state => state + 1)
-    .on(decrement, state => state - 1)
+  sample({
+    clock: onConvert,
+    source: $source,
+    filter: (source) => !!source,
+    target: convertQuery.start,
+  })
+
+  sample({
+    source: onSourceChange,
+    target: $source,
+  })
+
+  sample({
+    source: convertQuery.finished.success,
+    fn: ({result}) => result,
+    target: $mermaid,
+  })
 
   return {
     HomeGate,
-    $count,
-    increment,
-    decrement
+    onConvert,
+    onSourceChange,
+    $pending,
+    $source,
+    $mermaid,
   }
 })

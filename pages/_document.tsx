@@ -5,7 +5,7 @@ import {fontSans} from "app";
 export default () => (
   <Html className={fontSans.variable} lang="en">
     <Head/>
-    <body className={`bg-surface text-on-surface font-sans`}>
+    <body className="bg-surface text-on-surface font-sans">
     <Main/>
 
     <NextScript/>
