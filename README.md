@@ -1,76 +1,21 @@
-## Начало работы
+## Парсер sql в mermaid.
 
-```sh
-# Setup git hooks.
-bun run prepare
+Если вы знаете нормальный парсер sql, то сообщите о нем, пожалуйста.
+(Яп на которых может быть реализован парсер: Golang, JS/желательно TS и Питонизде)
+Ибо хуета которая здесь юзается сломана. В общем как и весь яп,
+который написали на коленках за 6 дней, а на 7 пили смузи.
 
-# Install dependencies.
-bun install
+## Конструкции с которыми не робит это говно:
 
-# Run project in dev env.
-bun run dev
+Уникальные индексы, но обычные работают (благодарности [сюда](https://github.com/taozhi8833998/node-sql-parser)):
+```sql
+CREATE UNIQUE INDEX ...
 ```
 
-## Технологии
-
-- Next (with turbopack)
-- Effector
-- TailwindCSS
-- Typescript
-- ESLint
-- Bun
-- FSD
-
-## Методология
-
-Используется методология FSD.
-
-### Правила
-
-- Если сегмент состоит из одного файла, то не нужно создавать директорию под этот сегмент. [Пример](/src/shared/factory.ts)
-- Разделение слов в наименованиях слайсов реализовывать через `-`.
-- Запрещены экспорты поумолчанию, если этого не требует Next.
-- Все компоненты должны реализовываться через стрелочные функции см. [Сниппеты](#сниппеты).
-
-## Соглашения о коммитах
-
-Коммит должен начинаться с заглавной буквы и только на английском языке.
-В противном случае у вас не получится создать коммит.
-
-## Сниппеты
-
-### rsc
-
-```tsx
-import React from 'react';
-
-export const $TM_FILENAME_BASE$ = () => {
- return (
-  <div>
-   $END$
-  </div>
- );
-};
-
-```
-
-### rsi
-
-```tsx
-import React from 'react';
-
-export const $TM_FILENAME_BASE$ = () => (
-  <div>
-    $END$
-  </div>
+GENERATED ALWAYS AS IDENTITY:
+```sql
+CREATE TABLE ... (
+  id BIGINT PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
+  ...
 );
-
-```
-
-### sep
-
-```tsx
-
-/* ===== $END$ ===== */
-
 ```

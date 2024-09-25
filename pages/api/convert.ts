@@ -16,7 +16,9 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
   let schema: Schema
 
   try {
-    schema = await converter.parse(body)
+    schema = await converter.parse(body, {
+      database: 'Postgresql',
+    })
   } catch (err) {
     console.error(err)
 

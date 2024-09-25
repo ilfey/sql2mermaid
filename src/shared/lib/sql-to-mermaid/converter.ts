@@ -55,6 +55,8 @@ export class Converter {
         const columnFk = schema.tables[tableName].columns[relation.columnForeignKey]
         const columnPk = schema.tables[relation.related].columns[relation.columnPrimaryKey]
 
+        console.log(relation, columnFk, columnPk)
+
         source += "\t" + tableName + " " + Converter.oneOrMany("left", columnFk) + Converter.zeroOrOne(columnFk) +
           "--" +
           Converter.zeroOrOne(columnPk) + Converter.oneOrMany("right", columnPk) + " " + relation.related + " : \"\"\n"
@@ -92,7 +94,7 @@ export class Converter {
             continue
           }
 
-          const columnName: string = createDef.column.column
+          const columnName = Converter.getColumnName(createDef.column.column)
           const type: string = createDef.definition.dataType
           const constraints: Constraint[] = []
 
@@ -110,17 +112,17 @@ export class Converter {
           }
 
           this.tables[tableName] = table
-
-        } else if (createDef.constraint_type === 'primary key') {
+          // Ебать спасибо, что у разных диалектов типы ограничений отличаются по стилю написания.
+        } else if (createDef.constraint_type.toLowerCase() === 'primary key') {
           for (const def of createDef.definition) {
-            table.columns[def.column].constraints.push(Constraint.PRIMARY_KEY)
+            table.columns[Converter.getColumnName(def.column)].constraints.push(Constraint.PRIMARY_KEY)
           }
-        } else if (createDef.constraint_type === 'foreign key') {
+        } else if (createDef.constraint_type.toLowerCase() === 'foreign key') {
           const relation = {} as Relation
 
           for (const def of createDef.definition) {
-            relation.columnForeignKey = def.column
-            table.columns[def.column].constraints.push(Constraint.FOREIGN_KEY)
+            relation.columnForeignKey = Converter.getColumnName(def.column)
+            table.columns[Converter.getColumnName(def.column)].constraints.push(Constraint.FOREIGN_KEY)
           }
 
           for (const table of createDef.reference_definition.table) {
@@ -128,7 +130,7 @@ export class Converter {
           }
 
           for (const def of createDef.reference_definition.definition) {
-            relation.columnPrimaryKey = def.column
+            relation.columnPrimaryKey = Converter.getColumnName(def.column)
           }
 
           if (!this.relations[tableName]) {
@@ -139,6 +141,15 @@ export class Converter {
         }
       }
     }
+  }
+
+  // eslint-disable-next-line
+  protected static getColumnName(column: any): string {
+    if (typeof column?.expr?.value === "string") {
+      return column.expr.value
+    }
+
+    return column as string
   }
 
   protected static formatConstraints(column: Column) {
